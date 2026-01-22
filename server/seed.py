@@ -1,34 +1,47 @@
-#!/usr/bin/env python3
+from app import app, db
+from models import Message
+from datetime import datetime, timedelta
 
-from random import choice as rc
-
-from faker import Faker
-
-from app import app
-from models import db, Message
-
-fake = Faker()
-
-usernames = [fake.first_name() for i in range(4)]
-if "Duane" not in usernames:
-    usernames.append("Duane")
-
-def make_messages():
-
+with app.app_context():
+    # Clear existing messages
     Message.query.delete()
+    db.session.commit()
     
-    messages = []
-
-    for i in range(20):
-        message = Message(
-            body=fake.sentence(),
-            username=rc(usernames),
-        )
-        messages.append(message)
-
+    # Create sample messages
+    messages = [
+        Message(
+            body="Hello everyone! Welcome to Chatterbox!",
+            username="Alice",
+            created_at=datetime.utcnow() - timedelta(minutes=10),
+            updated_at=datetime.utcnow() - timedelta(minutes=10)
+        ),
+        Message(
+            body="This is a great chat application!",
+            username="Bob",
+            created_at=datetime.utcnow() - timedelta(minutes=8),
+            updated_at=datetime.utcnow() - timedelta(minutes=8)
+        ),
+        Message(
+            body="I agree! Really enjoying this so far.",
+            username="Charlie",
+            created_at=datetime.utcnow() - timedelta(minutes=5),
+            updated_at=datetime.utcnow() - timedelta(minutes=5)
+        ),
+        Message(
+            body="Can't wait to see what's next!",
+            username="Diana",
+            created_at=datetime.utcnow() - timedelta(minutes=2),
+            updated_at=datetime.utcnow() - timedelta(minutes=2)
+        ),
+        Message(
+            body="Thanks for building this with us!",
+            username="Eve",
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        ),
+    ]
+    
     db.session.add_all(messages)
-    db.session.commit()        
-
-if __name__ == '__main__':
-    with app.app_context():
-        make_messages()
+    db.session.commit()
+    
+    print("Seed data created successfully!")
